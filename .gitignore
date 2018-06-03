@@ -1,0 +1,6 @@
+*.test
+/github-deploy
+
+# Nix
+result
+result-*
