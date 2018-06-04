@@ -13,7 +13,7 @@ import (
 )
 
 func CmdCleanup(c *cli.Context) (err error) {
-	_, owner, repo := githubSlug(c)
+	owner, repo := githubSlug(c)
 	listScript := c.String("list-script")
 	undeployScript := c.String("undeploy-script")
 	ctx := context.Background()

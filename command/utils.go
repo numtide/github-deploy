@@ -25,15 +25,15 @@ func githubClient(ctx context.Context, c *cli.Context) *github.Client {
 	return github.NewClient(tc)
 }
 
-var ReSlug = regexp.MustCompile("([\\w-]+)/([\\w-]+)")
+var ReSlug = regexp.MustCompile("[:/]([\\w-]+)/([\\w-]+)")
 
-func githubSlug(c *cli.Context) (string, string, string) {
+func githubSlug(c *cli.Context) (string, string) {
 	origin := c.GlobalString("git-origin")
 	matches := ReSlug.FindStringSubmatch(origin)
 	if len(matches) < 3 {
-		return "", "", ""
+		return "", ""
 	}
-	return matches[0], matches[1], matches[2]
+	return matches[1], matches[2]
 }
 
 const (

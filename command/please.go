@@ -15,7 +15,7 @@ import (
 const TaskName = "github-deploy"
 
 func CmdPlease(c *cli.Context) (err error) {
-	slug, owner, repo := githubSlug(c)
+	owner, repo := githubSlug(c)
 	deployScript := c.String("deploy-script")
 	ref := c.GlobalString("git-commit")
 	pr := c.String("pull-request")
@@ -30,7 +30,6 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	log.Println("commit ID", ref)
 	log.Println("origin", c.GlobalString("git-origin"))
-	log.Println("slug", slug)
 
 	// First, declare the new deployment to GitHub
 
