@@ -64,7 +64,7 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Prepare deploy script
 	var stdout strings.Builder
-	cmd := exec.Command(deployScript, pr)
+	cmd := exec.Command(deployScript, fmt.Sprintf("pr-%s", pr))
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 

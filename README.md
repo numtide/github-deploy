@@ -46,19 +46,19 @@ GLOBAL OPTIONS:
 
 ## Scripts interface
 
-### `DEPLOY_SCRIPT [PR]`
+### `DEPLOY_SCRIPT [NAME]`
 
-The deploy script takes an optional PR ID as an argument and returns the target URL on stdout.
+The deploy script takes an optional deployment name an argument and returns the target URL on stdout.
 
 Depending on the script exit status, the deployment is marked as a failure or success.
 
 ### `LIST_SCRIPT`
 
-Returns the list of PR IDs of all the temporary deployed application on stdout.
+Returns the list of all the temporary deployments on stdout.
 
-### `UNDEPLOY_SCRIPT <PR>`
+### `UNDEPLOY_SCRIPT <NAME>`
 
-Deletes a deployment mapping to the given PR ID.
+Deletes a deployment named `<NAME>`. Should not undeploy production.
 
 ## Install
 
