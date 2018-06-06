@@ -46,7 +46,7 @@ GLOBAL OPTIONS:
 
 ## Scripts interface
 
-### `DEPLOY_SCRIPT [NAME]`
+### `DEPLOY_SCRIPT <TARGET>`
 
 The deploy script takes an optional deployment name an argument and returns the target URL on stdout.
 
@@ -56,9 +56,9 @@ Depending on the script exit status, the deployment is marked as a failure or su
 
 Returns the list of all the temporary deployments on stdout.
 
-### `UNDEPLOY_SCRIPT <NAME>`
+### `UNDEPLOY_SCRIPT <TARGET>`
 
-Deletes a deployment named `<NAME>`. Should not undeploy production.
+Deletes a deployment named `<TARGET>`. Should not undeploy production.
 
 ## Install
 

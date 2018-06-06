@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -17,12 +18,22 @@ const TaskName = "github-deploy"
 func CmdPlease(c *cli.Context) (err error) {
 	owner, repo := githubSlug(c)
 	deployScript := c.String("deploy-script")
-	ref := c.GlobalString("git-commit")
-	pr := c.String("pull-request")
-	logURL := c.String("build-url")
 	environment := c.String("environment")
-	if pr != "" {
-		environment = fmt.Sprintf("review-%s", pr)
+	logURL := c.String("build-url")
+	prStr := c.String("pull-request")
+	ref := c.GlobalString("git-commit")
+
+	var pr int
+	if prStr != "" && prStr != "false" {
+		pr, err = strconv.Atoi(prStr)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Override the deployment target on pull-request
+	if pr > 0 {
+		environment = fmt.Sprintf("pr-%d", pr)
 	}
 
 	ctx := context.Background()
@@ -53,8 +64,8 @@ func CmdPlease(c *cli.Context) (err error) {
 			Payload:               refString("{}"),
 			Environment:           refString(environment),
 			Description:           refString(TaskName),
-			TransientEnvironment:  refBool(pr != ""),
-			ProductionEnvironment: refBool(pr == ""),
+			TransientEnvironment:  refBool(pr > 0),
+			ProductionEnvironment: refBool(pr == 0),
 		})
 		if err != nil {
 			return err
@@ -64,7 +75,7 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Prepare deploy script
 	var stdout strings.Builder
-	cmd := exec.Command(deployScript, fmt.Sprintf("pr-%s", pr))
+	cmd := exec.Command(deployScript, environment)
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 
