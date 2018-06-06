@@ -12,8 +12,9 @@ import (
 var GlobalFlags = []cli.Flag{
 	// This is only really needed for the "please" command
 	altsrc.NewStringFlag(cli.StringFlag{
-		Name:  "git-commit",
-		Usage: "git commit ID",
+		Name:   "git-commit",
+		Usage:  "git commit ID",
+		EnvVar: "TRAVIS_PULL_REQUEST_SHA",
 		//EnvVar: "TRAVIS_COMMIT,BUILDKITE_COMMIT",
 	}),
 	altsrc.NewStringFlag(cli.StringFlag{
