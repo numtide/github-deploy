@@ -45,7 +45,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 	}
 	openPRs := make([]string, len(prs))
 	for i, pr := range prs {
-		openPRs[i] = fmt.Sprintf("pr-%d", *pr.ID)
+		openPRs[i] = fmt.Sprintf("pr-%d", *pr.Number)
 	}
 	log.Println("open PRs:", openPRs)
 
