@@ -14,13 +14,12 @@ var GlobalFlags = []cli.Flag{
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:   "git-commit",
 		Usage:  "git commit ID",
-		EnvVar: "TRAVIS_PULL_REQUEST_SHA",
-		//EnvVar: "TRAVIS_COMMIT,BUILDKITE_COMMIT",
+		EnvVar: "BUILDKITE_COMMIT,CIRCLE_SHA1,TRAVIS_PULL_REQUEST_SHA",
 	}),
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:  "git-origin",
 		Usage: "URL of the repo",
-		//EnvVar: "BUILDKITE_REPO", // Travis doesn't have an equivalent
+		EnvVar: "BUILDKITE_REPO,CIRCLE_REPOSITORY_URL", // Travis doesn't have an equivalent
 	}),
 	cli.StringFlag{
 		Name:   "github-token",
@@ -42,7 +41,7 @@ var Commands = []cli.Command{
 			cli.StringFlag{
 				Name:   "pr, pull-request",
 				Usage:  "Creates a temporary deployment for the give pull-request ID",
-				EnvVar: "TRAVIS_PULL_REQUEST,BUILDKITE_PULL_REQUEST",
+				EnvVar: "BUILDKITE_PULL_REQUEST,CIRCLE_PULL_REQUEST,TRAVIS_PULL_REQUEST",
 			},
 			cli.StringFlag{
 				Name:  "environment",
@@ -52,7 +51,8 @@ var Commands = []cli.Command{
 			cli.StringFlag{
 				Name:   "build-url",
 				Usage:  "URL to follow the build progress",
-				EnvVar: "BUILDKITE_BUILD_URL", // NOTE: Travis doesn't have an equivalent
+				// NOTE: Travis doesn't have an equivalent
+				EnvVar: "BUILDKITE_BUILD_URL,CIRCLE_BUILD_URL",
 			},
 		},
 	},
