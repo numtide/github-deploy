@@ -18,6 +18,7 @@ git commit checked out.
 
 ## Usage
 
+`$ ./github-deploy`
 ```
 NAME:
    github-deploy - A CLI that integrates deployments with github
@@ -26,7 +27,7 @@ USAGE:
    github-deploy [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.0
+   0.2.0
 
 AUTHOR:
    zimbatm <zimbatm@zimbatm.com>
@@ -37,8 +38,8 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --git-commit value    git commit ID
-   --git-origin value    URL of the repo
+   --git-commit value    git commit ID [$BUILDKITE_COMMIT, $CIRCLE_SHA1, $TRAVIS_PULL_REQUEST_SHA]
+   --git-origin value    URL of the repo [$BUILDKITE_REPO, $CIRCLE_REPOSITORY_URL]
    --github-token value  Github Personal access token to interact with the Github API [$GITHUB_AUTH_TOKEN]
    --help, -h            show help
    --version, -v         print the version

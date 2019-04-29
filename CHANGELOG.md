@@ -1,19 +1,16 @@
-## 0.1.0 (2018-06-03)
 
-Initial release
+0.2.0 / 2019-04-29
+==================
 
-### Added
+  * add support for Circle CI
 
-- Add Fundamental features
+0.1.0 / 2018-06-03
+==================
 
-### Deprecated
+  * cleanup: fix the opened PR list
+  * report to the right commit ID in Travis
+  * fixes bug with Travis CI
+  * relax the deployment names
+  * fix github slug parsing
+  * Hi
 
-- Nothing
-
-### Removed
-
-- Nothing
-
-### Fixed
-
-- Nothing
