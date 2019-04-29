@@ -6,19 +6,21 @@ import (
 	"regexp"
 
 	"github.com/google/go-github/github"
+	"github.com/zimbatm/go-secretvalue"
 	"golang.org/x/oauth2"
 	"gopkg.in/urfave/cli.v1"
 )
 
 func githubClient(ctx context.Context, c *cli.Context) *github.Client {
-	token := c.GlobalString("github-token")
-	if token == "" {
+	token := c.GlobalGeneric("github-token").(*secretvalue.StringFlag).SecretValue
+	if !token.IsSet() {
 		log.Fatal("missing github auth token")
 	}
+
 	// log.Println("github auth token", token)
 	// TODO: determine the right API based on c.GlobalString("git-origin")
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
+		&oauth2.Token{AccessToken: token.GetString()},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 

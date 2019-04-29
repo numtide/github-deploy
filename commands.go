@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/zimbatm/github-deploy/command"
+	"github.com/zimbatm/go-secretvalue"
 	"gopkg.in/urfave/cli.v1"
 	"gopkg.in/urfave/cli.v1/altsrc"
 )
@@ -17,14 +18,17 @@ var GlobalFlags = []cli.Flag{
 		EnvVar: "BUILDKITE_COMMIT,CIRCLE_SHA1,TRAVIS_PULL_REQUEST_SHA",
 	}),
 	altsrc.NewStringFlag(cli.StringFlag{
-		Name:  "git-origin",
-		Usage: "URL of the repo",
+		Name:   "git-origin",
+		Usage:  "URL of the repo",
 		EnvVar: "BUILDKITE_REPO,CIRCLE_REPOSITORY_URL", // Travis doesn't have an equivalent
 	}),
-	cli.StringFlag{
+	cli.GenericFlag{
 		Name:   "github-token",
 		Usage:  "Github Personal access token to interact with the Github API",
 		EnvVar: "GITHUB_AUTH_TOKEN",
+		Value: &secretvalue.StringFlag{
+			SecretValue: secretvalue.New("github-token"),
+		},
 	},
 }
 
@@ -49,8 +53,8 @@ var Commands = []cli.Command{
 				Usage: "Sets the target environment, ignored if pull-request is passed",
 			},
 			cli.StringFlag{
-				Name:   "build-url",
-				Usage:  "URL to follow the build progress",
+				Name:  "build-url",
+				Usage: "URL to follow the build progress",
 				// NOTE: Travis doesn't have an equivalent
 				EnvVar: "BUILDKITE_BUILD_URL,CIRCLE_BUILD_URL",
 			},

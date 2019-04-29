@@ -58,3 +58,8 @@ func (s *SecretValue) SetString(secret string) *SecretValue {
 func (s *SecretValue) Forget() {
 	s.secret = nil
 }
+
+// IsSet will return true if the secret is set, false otherwise
+func (s *SecretValue) IsSet() bool {
+	return len(s.secret) > 0
+}

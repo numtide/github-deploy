@@ -111,11 +111,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bdfc093be06c331c3d9cd2cd7e1c4cfad251c74b4996036bc5753172d8ddd681"
+  digest = "1:eaaf505f984c913e2eb8968aaabbfcf9e90b9faa284d7d85ea70681cf4dd7fbb"
   name = "github.com/zimbatm/go-secretvalue"
   packages = ["."]
   pruneopts = "UT"
-  revision = "2aea082c76be2cce9daaa8da2bf7bd66a93e881a"
+  revision = "f5f44e7f9f16e955bf96b3c8cff3bd0d19660e76"
 
 [[projects]]
   branch = "master"
