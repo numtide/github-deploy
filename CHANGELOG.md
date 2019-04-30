@@ -1,4 +1,9 @@
 
+0.3.0 / 2019-04-29
+==================
+
+  * wrap the github token in zimbatm/go-secretvalue
+
 0.2.0 / 2019-04-29
 ==================
 
