@@ -25,6 +25,10 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	var pr int
 	if prStr != "" && prStr != "false" {
+		// prStr might be a URL, in that case pull the last component of the path
+		strs := strings.Split(prStr, "/")
+		prStr = strs[len(strs)-1]
+
 		pr, err = strconv.Atoi(prStr)
 		if err != nil {
 			return err
