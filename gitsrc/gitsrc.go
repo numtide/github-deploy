@@ -2,6 +2,7 @@
 package gitsrc
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -41,6 +42,17 @@ func (x *gitSource) String(name string) (string, error) {
 			return "", err
 		}
 		return ref.Hash().String(), nil
+	case "git-branch":
+		ref, err := x.Head()
+		if err != nil {
+			return "", err
+		}
+		refName := ref.Name()
+		if refName.IsBranch() {
+			return refName.String(), nil
+		} else {
+			return "", errors.New("Ref is not a branch")
+		}
 	}
 	return "", ErrNotFound
 }
