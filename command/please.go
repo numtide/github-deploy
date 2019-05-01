@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -53,15 +54,9 @@ func CmdPlease(c *cli.Context) (err error) {
 		}
 	}
 
-	// If the environment is not set, set as follows:
-	//   * branch is master: production
-	//   * otherwise: pr-preview
-	if environment == "" {
-		if branch == "master" {
-			environment = "production"
-		} else {
-			environment = "pr-preview"
-		}
+	// Override the deployment target on pull-request
+	if pr > 0 {
+		environment = fmt.Sprintf("pr-%d", pr)
 	}
 
 	ctx := context.Background()
