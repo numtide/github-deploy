@@ -2,9 +2,8 @@ let pkgs = import <nixpkgs> {}; in with pkgs;
 mkShell {
   buildInputs = [
     go
-    dep
   ];
   shellHook = ''
-    export GOPATH=$HOME/go
+    export GO111MODULE=on
   '';
 }
