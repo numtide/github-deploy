@@ -18,7 +18,7 @@ git commit checked out.
 
 ## Usage
 
-`$ ./github-deploy`
+`$ ./github-deploy --help`
 ```
 NAME:
    github-deploy - A CLI that integrates deployments with github
@@ -40,13 +40,12 @@ COMMANDS:
 GLOBAL OPTIONS:
    --git-commit value    git commit ID [$BUILDKITE_COMMIT, $CIRCLE_SHA1, $TRAVIS_PULL_REQUEST_SHA]
    --git-branch value    git branch [$BUILDKITE_BRANCH, $CIRCLE_BRANCH, $TRAVIS_BRANCH]
-   --git-ref-commit      use the commit as deployment reference instead of branch
    --git-origin value    URL of the repo [$BUILDKITE_REPO, $CIRCLE_REPOSITORY_URL]
+   --git-ref-commit      use the commit as deployment reference instead of branch
    --github-token value  Github Personal access token to interact with the Github API (default: <secret:github-token>) [$GITHUB_AUTH_TOKEN]
    --help, -h            show help
    --version, -v         print the version
 ```
-
 ## Scripts interface
 
 ### `DEPLOY_SCRIPT <TARGET>`
