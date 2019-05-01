@@ -22,10 +22,10 @@ var GlobalFlags = []cli.Flag{
 		Usage:  "git branch",
 		EnvVar: "BUILDKITE_BRANCH,CIRCLE_BRANCH,TRAVIS_BRANCH",
 	}),
-	altsrc.NewBoolFlag(cli.BoolFlag{
+	cli.BoolFlag{
 		Name:  "git-ref-commit",
 		Usage: "use the commit as deployment reference instead of branch",
-	}),
+	},
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:   "git-origin",
 		Usage:  "URL of the repo",
