@@ -54,9 +54,18 @@ func CmdPlease(c *cli.Context) (err error) {
 		}
 	}
 
-	// Override the deployment target on pull-request
-	if pr > 0 {
-		environment = fmt.Sprintf("pr-%d", pr)
+	// If the environment is not set, set as follows:
+	//   * using commit as ref, and PR is open: pr-<PR number>
+	//   * branch is master: production
+	//   * otherwise: <branch>
+	if environment == "" {
+		if commitRef && pr > 0 {
+			environment = fmt.Sprintf("pr-%d", pr)
+		} else if branch == "master" {
+			environment = "production"
+		} else {
+			environment = fmt.Sprintf("%s", branch)
+		}
 	}
 
 	ctx := context.Background()
