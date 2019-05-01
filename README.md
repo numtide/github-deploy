@@ -27,7 +27,7 @@ USAGE:
    github-deploy [global options] command [command options] [arguments...]
 
 VERSION:
-   0.2.0
+   0.3.0
 
 AUTHOR:
    zimbatm <zimbatm@zimbatm.com>
@@ -39,8 +39,10 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --git-commit value    git commit ID [$BUILDKITE_COMMIT, $CIRCLE_SHA1, $TRAVIS_PULL_REQUEST_SHA]
+   --git-branch value    git branch [$BUILDKITE_BRANCH, $CIRCLE_BRANCH, $TRAVIS_BRANCH]
+   --git-ref-commit      use the commit as deployment reference instead of branch
    --git-origin value    URL of the repo [$BUILDKITE_REPO, $CIRCLE_REPOSITORY_URL]
-   --github-token value  Github Personal access token to interact with the Github API [$GITHUB_AUTH_TOKEN]
+   --github-token value  Github Personal access token to interact with the Github API (default: <secret:github-token>) [$GITHUB_AUTH_TOKEN]
    --help, -h            show help
    --version, -v         print the version
 ```

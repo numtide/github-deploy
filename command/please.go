@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"os"
 	"os/exec"
@@ -21,7 +21,25 @@ func CmdPlease(c *cli.Context) (err error) {
 	environment := c.String("environment")
 	logURL := c.String("build-url")
 	prStr := c.String("pull-request")
-	ref := c.GlobalString("git-commit")
+	commit := c.GlobalString("git-commit")
+	branch := c.GlobalString("git-branch")
+	commitRef := c.GlobalBool("git-ref-commit")
+
+	ref := ""
+
+	if commitRef {
+		if commit == "" {
+			return errors.New("Trying to use commit as ref but commit is not set")
+		} else {
+			ref = commit
+		}
+	} else {
+		if branch == "" {
+			return errors.New("Trying to use branch as ref but branch is not set")
+		} else {
+			ref = branch
+		}
+	}
 
 	var pr int
 	if prStr != "" && prStr != "false" {
@@ -35,15 +53,21 @@ func CmdPlease(c *cli.Context) (err error) {
 		}
 	}
 
-	// Override the deployment target on pull-request
-	if pr > 0 {
-		environment = fmt.Sprintf("pr-%d", pr)
+	// If the environment is not set, set as follows:
+	//   * branch is master: production
+	//   * otherwise: pr-preview
+	if environment == "" {
+		if branch == "master" {
+			environment = "production"
+		} else {
+			environment = "pr-preview"
+		}
 	}
 
 	ctx := context.Background()
 	gh := githubClient(ctx, c)
 
-	log.Println("commit ID", ref)
+	log.Println("deploy ref", ref)
 	log.Println("origin", c.GlobalString("git-origin"))
 
 	// First, declare the new deployment to GitHub
