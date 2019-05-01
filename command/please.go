@@ -107,7 +107,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 
-	updateStatus := func(state string, environmentURL string) {
+	updateStatus := func(state string, environmentURL string) error {
 		_, _, err := gh.Repositories.CreateDeploymentStatus(ctx, owner, repo, *deployment.ID, &github.DeploymentStatusRequest{
 			State:          refString(state),
 			LogURL:         refString(logURL),
@@ -118,6 +118,7 @@ func CmdPlease(c *cli.Context) (err error) {
 		if err != nil {
 			log.Println("updateStatus:", err)
 		}
+		return err
 	}
 
 	// Start deploy script
@@ -128,7 +129,10 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Record progress
-	updateStatus(StatePending, "")
+	err = updateStatus(StatePending, "")
+	if err != nil {
+		return err
+	}
 
 	// Wait on the deploy to finish
 	err = cmd.Wait()
@@ -140,7 +144,6 @@ func CmdPlease(c *cli.Context) (err error) {
 	// Success!
 	out := strings.SplitN(stdout.String(), "\n", 2)
 	environmentURL := out[0]
-	updateStatus(StateSuccess, environmentURL)
-
-	return nil
+	err = updateStatus(StateSuccess, environmentURL)
+	return err
 }
