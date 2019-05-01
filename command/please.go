@@ -110,16 +110,16 @@ func CmdPlease(c *cli.Context) (err error) {
 			EnvironmentURL: refString(environmentURL),
 			//AutoInactive: refBool(true),
 		})
-		if err != nil {
-			log.Println("updateStatus:", err)
-		}
 		return err
 	}
 
 	// Start deploy script
 	err = cmd.Start()
 	if err != nil {
-		updateStatus(StateError, "")
+		err2 := updateStatus(StateError, "")
+		if err2 != nil {
+			log.Println("updateStatus:", err)
+		}
 		return err
 	}
 
@@ -132,13 +132,16 @@ func CmdPlease(c *cli.Context) (err error) {
 	// Wait on the deploy to finish
 	err = cmd.Wait()
 	if err != nil {
-		updateStatus(StateFailure, "")
+		err2 := updateStatus(StateFailure, "")
+		if err2 != nil {
+			log.Println("updateStatus:", err)
+		}
 		return err
 	}
 
 	// Success!
 	out := strings.SplitN(stdout.String(), "\n", 2)
-	environmentURL := out[0]
+	environmentURL := strings.TrimSpace(out[0])
 	err = updateStatus(StateSuccess, environmentURL)
 	return err
 }
