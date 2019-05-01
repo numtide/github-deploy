@@ -2,20 +2,22 @@
 package gitsrc
 
 import (
-	"errors"
-	"fmt"
 	"time"
 
+	"golang.org/x/xerrors"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/urfave/cli.v1"
 	"gopkg.in/urfave/cli.v1/altsrc"
 )
 
 // ErrNotSupported is returned by all the functions that are not String()
-var ErrNotSupported = fmt.Errorf("operation not supported")
+var ErrNotSupported = xerrors.New("gitsrc: operation not supported")
 
-// ErrNotFound is returns when the String(name) doesn't have a reference
-var ErrNotFound = fmt.Errorf("key not found")
+// ErrNotFound is returned when the String(name) doesn't have a reference
+var ErrNotFound = xerrors.New("gitsrc: key not found")
+
+// ErrNotBranch is returned when the git repo is not on a branch
+var ErrNotBranch = xerrors.New("gitsrc: ref is not a branch")
 
 // FromCurrentDir tries to open $PWD as the git repo
 func FromCurrentDir(*cli.Context) (altsrc.InputSourceContext, error) {
@@ -33,26 +35,25 @@ func (x *gitSource) String(name string) (string, error) {
 	case "git-origin":
 		remote, err := x.Remote("origin")
 		if err != nil {
-			return "", err
+			return "", xerrors.Errorf("gitsrc: %w", err)
 		}
 		return remote.Config().URLs[0], nil
 	case "git-commit":
 		ref, err := x.Head()
 		if err != nil {
-			return "", err
+			return "", xerrors.Errorf("gitsrc: %w", err)
 		}
 		return ref.Hash().String(), nil
 	case "git-branch":
 		ref, err := x.Head()
 		if err != nil {
-			return "", err
+			return "", xerrors.Errorf("gitsrc: %w", err)
 		}
 		refName := ref.Name()
 		if refName.IsBranch() {
 			return refName.String(), nil
-		} else {
-			return "", errors.New("Ref is not a branch")
 		}
+		return "", ErrNotBranch
 	}
 	return "", ErrNotFound
 }

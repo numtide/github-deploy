@@ -151,7 +151,7 @@
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "4829fb13d2c62012c17688fa7f629f371014946d"
+  revision = "9ce7a6920f093fc0b908c4a5f66ae049110f417e"
 
 [[projects]]
   branch = "master"
@@ -166,7 +166,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e549b88d88738eeb566343bce8628cb20433cbcbc5d856a19ad447188bebc902"
+  digest = "1:6eb74aa473ae5121e9f3e5d7fc029c42158ee053b3108a7829001f7523488434"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -174,7 +174,18 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "2cc0cad0ac78f3ede1f4d2b6ca16ea3038641af4"
+  revision = "d89cdac9e8725f2aefce25fcbfef41134c9ad412"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d9d3a231c70b17470fc134900032da48d5c146f0f4a2ce12ceb92704dae8d67d"
+  name = "golang.org/x/xerrors"
+  packages = [
+    ".",
+    "internal",
+  ]
+  pruneopts = "UT"
+  revision = "1f06c39b43733b74392b1972507822714ced3242"
 
 [[projects]]
   digest = "1:6eb6e3b6d9fffb62958cf7f7d88dbbe1dd6839436b0802e194c590667a40412a"
@@ -290,6 +301,7 @@
     "github.com/google/go-github/github",
     "github.com/zimbatm/go-secretvalue",
     "golang.org/x/oauth2",
+    "golang.org/x/xerrors",
     "gopkg.in/src-d/go-git.v4",
     "gopkg.in/urfave/cli.v1",
     "gopkg.in/urfave/cli.v1/altsrc",
