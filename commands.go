@@ -22,15 +22,15 @@ var GlobalFlags = []cli.Flag{
 		Usage:  "git branch",
 		EnvVar: "BUILDKITE_BRANCH,CIRCLE_BRANCH,TRAVIS_BRANCH",
 	}),
-	altsrc.NewBoolFlag(cli.BoolFlag{
-		Name:  "git-ref-commit",
-		Usage: "use the commit as deployment reference instead of branch",
-	}),
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:   "git-origin",
 		Usage:  "URL of the repo",
 		EnvVar: "BUILDKITE_REPO,CIRCLE_REPOSITORY_URL", // Travis doesn't have an equivalent
 	}),
+	cli.BoolFlag{
+		Name:  "git-ref-commit",
+		Usage: "use the commit as deployment reference instead of branch",
+	},
 	cli.GenericFlag{
 		Name:   "github-token",
 		Usage:  "Github Personal access token to interact with the Github API",
