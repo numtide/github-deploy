@@ -55,16 +55,13 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// If the environment is not set, set as follows:
-	//   * using commit as ref, and PR is open: pr-<PR number>
 	//   * branch is master: production
-	//   * otherwise: <branch>
+	//   * otherwise: pr-preview
 	if environment == "" {
-		if commitRef && pr > 0 {
-			environment = fmt.Sprintf("pr-%d", pr)
-		} else if branch == "master" {
+		if branch == "master" {
 			environment = "production"
 		} else {
-			environment = fmt.Sprintf("%s", branch)
+			environment = "pr-preview"
 		}
 	}
 
