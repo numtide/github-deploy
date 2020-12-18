@@ -1,6 +1,5 @@
 # github-deploy - Track deployments on GitHub
 
-[![Build Status](https://travis-ci.com/zimbatm/github-deploy.svg?branch=master)](https://travis-ci.com/zimbatm/github-deploy)
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 An opinionated command-line utility that integrates deployments with the github Deployment API.
