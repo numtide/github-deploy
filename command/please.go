@@ -25,6 +25,26 @@ func CmdPlease(c *cli.Context) (err error) {
 	commit := c.GlobalString("git-commit")
 	branch := c.GlobalString("git-branch")
 	commitRef := c.GlobalBool("git-ref-commit")
+	origin := c.GlobalString("git-origin")
+
+	// Compose the Git originl URL in the case of GitHub Actions
+	if origin == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
+		origin = fmt.Sprintf(
+			"%s/%s.git",
+			os.Getenv("GITHUB_SERVER_URL"),
+			os.Getenv("GITHUB_REPOSITORY"),
+		)
+	}
+
+	// Compose the log URL in the case of GitHub Actions
+	if logURL == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
+		logURL = fmt.Sprintf(
+			"%s/%s/actions/runs/%s",
+			os.Getenv("GITHUB_SERVER_URL"),
+			os.Getenv("GITHUB_REPOSITORY"),
+			os.Getenv("GITHUB_RUN_ID"),
+		)
+	}
 
 	ref := ""
 
@@ -63,7 +83,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	gh := githubClient(ctx, c)
 
 	log.Println("deploy ref", ref)
-	log.Println("origin", c.GlobalString("git-origin"))
+	log.Println("origin", origin)
 
 	// First, declare the new deployment to GitHub
 

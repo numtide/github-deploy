@@ -15,16 +15,18 @@ var GlobalFlags = []cli.Flag{
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:   "git-commit",
 		Usage:  "git commit ID",
-		EnvVar: "BUILDKITE_COMMIT,CIRCLE_SHA1,TRAVIS_PULL_REQUEST_SHA",
+		EnvVar: "GITHUB_SHA,BUILDKITE_COMMIT,CIRCLE_SHA1,TRAVIS_PULL_REQUEST_SHA",
 	}),
 	altsrc.NewStringFlag(cli.StringFlag{
 		Name:   "git-branch",
 		Usage:  "git branch",
-		EnvVar: "BUILDKITE_BRANCH,CIRCLE_BRANCH,TRAVIS_BRANCH",
+		EnvVar: "GITHUB_REF,BUILDKITE_BRANCH,CIRCLE_BRANCH,TRAVIS_BRANCH",
 	}),
 	altsrc.NewStringFlag(cli.StringFlag{
-		Name:   "git-origin",
-		Usage:  "URL of the repo",
+		Name:  "git-origin",
+		Usage: "URL of the repo",
+		// NOTE: In the case of GitHub Actions, there is no env var that provides
+		//       this directly.
 		EnvVar: "BUILDKITE_REPO,CIRCLE_REPOSITORY_URL", // Travis doesn't have an equivalent
 	}),
 	cli.BoolFlag{
@@ -34,7 +36,7 @@ var GlobalFlags = []cli.Flag{
 	cli.GenericFlag{
 		Name:   "github-token",
 		Usage:  "Github Personal access token to interact with the Github API",
-		EnvVar: "GITHUB_AUTH_TOKEN",
+		EnvVar: "GITHUB_TOKEN",
 		Value: &secretvalue.StringFlag{
 			SecretValue: secretvalue.New("github-token"),
 		},
@@ -52,8 +54,10 @@ var Commands = []cli.Command{
 				Usage: "Script that deploys the given PR",
 			},
 			cli.StringFlag{
-				Name:   "pr, pull-request",
-				Usage:  "Creates a temporary deployment for the give pull-request ID",
+				Name:  "pr, pull-request",
+				Usage: "Creates a temporary deployment for the give pull-request ID",
+				// NOTE: GitHub Actions doesn't have an env var like that and the
+				//       argument must be passed explicitly.
 				EnvVar: "BUILDKITE_PULL_REQUEST,CIRCLE_PULL_REQUEST,TRAVIS_PULL_REQUEST",
 			},
 			cli.StringFlag{
@@ -65,6 +69,8 @@ var Commands = []cli.Command{
 				Name:  "build-url",
 				Usage: "URL to follow the build progress",
 				// NOTE: Travis doesn't have an equivalent
+				// NOTE: For GitHub Actions, the URL is composed later in the command
+				//       if empty.
 				EnvVar: "BUILDKITE_BUILD_URL,CIRCLE_BUILD_URL",
 			},
 		},

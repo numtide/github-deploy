@@ -41,7 +41,7 @@ GLOBAL OPTIONS:
    --git-branch value    git branch [$BUILDKITE_BRANCH, $CIRCLE_BRANCH, $TRAVIS_BRANCH]
    --git-origin value    URL of the repo [$BUILDKITE_REPO, $CIRCLE_REPOSITORY_URL]
    --git-ref-commit      use the commit as deployment reference instead of branch
-   --github-token value  Github Personal access token to interact with the Github API (default: <secret:github-token>) [$GITHUB_AUTH_TOKEN]
+   --github-token value  Github Personal access token to interact with the Github API (default: <secret:github-token>) [$GITHUB_TOKEN]
    --help, -h            show help
    --version, -v         print the version
 ```
@@ -77,7 +77,7 @@ Go to https://github.com/settings/tokens/new
 
 Select `repo`
 
-export GITHUB_AUTH_TOKEN=<new-token>
+export GITHUB_TOKEN=<new-token>
 
 ### Create the wrapper scripts
 
