@@ -1,4 +1,10 @@
 
+0.5.0 / 2022-01-15
+==================
+
+  * bump all the dependencies
+  * add support for GitHub Actions
+
 0.4.n / 2020-12-18
 ==================
 
