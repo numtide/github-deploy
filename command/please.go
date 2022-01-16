@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const TaskName = "github-deploy"
@@ -116,9 +116,14 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	}
 
+	deployScriptSubStrings := strings.Fields(deployScript)
+	if len(deployScriptSubStrings) == 1 {
+		deployScriptSubStrings = append(deployScriptSubStrings, environment)
+	}
+
 	// Prepare deploy script
 	var stdout strings.Builder
-	cmd := exec.Command(deployScript, environment)
+	cmd := exec.Command(deployScriptSubStrings[0], deployScriptSubStrings[1:]...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 
