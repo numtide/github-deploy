@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const TaskName = "github-deploy"
@@ -26,6 +26,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	branch := c.GlobalString("git-branch")
 	commitRef := c.GlobalBool("git-ref-commit")
 	origin := c.GlobalString("git-origin")
+	environmentURL := c.String("environment-url")
 
 	// Compose the Git originl URL in the case of GitHub Actions
 	if origin == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
@@ -161,7 +162,9 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Success!
 	out := strings.SplitN(stdout.String(), "\n", 2)
-	environmentURL := strings.TrimSpace(out[0])
+	if environmentURL == "" {
+		environmentURL = strings.TrimSpace(out[0])
+	}
 	err = updateStatus(StateSuccess, environmentURL)
 	return err
 }

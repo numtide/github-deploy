@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/zimbatm/github-deploy/command"
-	"github.com/zimbatm/go-secretvalue"
-	"gopkg.in/urfave/cli.v1"
+	secretvalue "github.com/zimbatm/go-secretvalue"
+	cli "gopkg.in/urfave/cli.v1"
 	"gopkg.in/urfave/cli.v1/altsrc"
 )
 
@@ -64,6 +64,11 @@ var Commands = []cli.Command{
 				Name:  "environment",
 				Value: "production",
 				Usage: "Sets the target environment, ignored if pull-request is passed",
+			},
+			cli.StringFlag{
+				Name:  "environment-url",
+				Value: "",
+				Usage: "Optional url to access your environment",
 			},
 			cli.StringFlag{
 				Name:  "build-url",

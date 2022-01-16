@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/zimbatm/github-deploy/gitsrc"
-	"gopkg.in/urfave/cli.v1"
-	"gopkg.in/urfave/cli.v1/altsrc"
+	cli "gopkg.in/urfave/cli.v1"
+	altsrc "gopkg.in/urfave/cli.v1/altsrc"
 )
 
 func main() {
