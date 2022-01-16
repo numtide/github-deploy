@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const TaskName = "github-deploy"
@@ -26,6 +26,13 @@ func CmdPlease(c *cli.Context) (err error) {
 	branch := c.GlobalString("git-branch")
 	commitRef := c.GlobalBool("git-ref-commit")
 	origin := c.GlobalString("git-origin")
+
+	if deployScript != "" {
+		return fmt.Errorf("--deploy-script is deprecated, use a positional argument instead")
+	}
+	if c.NArg() == 0 {
+		return fmt.Errorf("Missing the deploy script as a positional argument")
+	}
 
 	// Compose the Git originl URL in the case of GitHub Actions
 	if origin == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
@@ -116,9 +123,14 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	}
 
+	deployScriptSubStrings := strings.Fields(deployScript)
+	if len(deployScriptSubStrings) == 1 {
+		deployScriptSubStrings = append(deployScriptSubStrings, environment)
+	}
+
 	// Prepare deploy script
 	var stdout strings.Builder
-	cmd := exec.Command(deployScript, environment)
+	cmd := exec.Command(c.Args().Get(0), c.Args()...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 

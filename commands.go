@@ -51,7 +51,7 @@ var Commands = []cli.Command{
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "deploy-script",
-				Usage: "Script that deploys the given PR",
+				Usage: "DEPRECATED. Use a positional argument instead.",
 			},
 			cli.StringFlag{
 				Name:  "pr, pull-request",
