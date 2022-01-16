@@ -1,9 +1,11 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -11,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const TaskName = "github-deploy"
@@ -26,6 +28,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	branch := c.GlobalString("git-branch")
 	commitRef := c.GlobalBool("git-ref-commit")
 	origin := c.GlobalString("git-origin")
+	logScript := c.Bool("log-deploy-script")
 
 	// Compose the Git originl URL in the case of GitHub Actions
 	if origin == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
@@ -118,9 +121,15 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Prepare deploy script
 	var stdout strings.Builder
+	var stdoutBuf bytes.Buffer
 	cmd := exec.Command(deployScript, environment)
-	cmd.Stdout = &stdout
-	cmd.Stderr = os.Stderr
+	if logScript {
+		cmd.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
+		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stdout = &stdout
+		cmd.Stderr = os.Stderr
+	}
 
 	updateStatus := func(state string, environmentURL string) error {
 		_, _, err := gh.Repositories.CreateDeploymentStatus(ctx, owner, repo, *deployment.ID, &github.DeploymentStatusRequest{
@@ -160,7 +169,13 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Success!
-	out := strings.SplitN(stdout.String(), "\n", 2)
+	var out []string
+	if logScript {
+		out = strings.SplitN(string(stdoutBuf.Bytes()), "\n", 2)
+	} else {
+		out = strings.SplitN(stdout.String(), "\n", 2)
+	}
+
 	environmentURL := strings.TrimSpace(out[0])
 	err = updateStatus(StateSuccess, environmentURL)
 	return err

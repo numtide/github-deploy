@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/zimbatm/github-deploy/command"
-	"github.com/zimbatm/go-secretvalue"
-	"gopkg.in/urfave/cli.v1"
-	"gopkg.in/urfave/cli.v1/altsrc"
+	secretvalue "github.com/zimbatm/go-secretvalue"
+	cli "gopkg.in/urfave/cli.v1"
+	altsrc "gopkg.in/urfave/cli.v1/altsrc"
 )
 
 var GlobalFlags = []cli.Flag{
@@ -52,6 +52,10 @@ var Commands = []cli.Command{
 			cli.StringFlag{
 				Name:  "deploy-script",
 				Usage: "Script that deploys the given PR",
+			},
+			cli.BoolFlag{
+				Name:  "log-deploy-script",
+				Usage: "Log script stdout",
 			},
 			cli.StringFlag{
 				Name:  "pr, pull-request",
