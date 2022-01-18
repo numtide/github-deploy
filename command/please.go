@@ -1,9 +1,11 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -118,9 +120,9 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Prepare deploy script
-	var stdout strings.Builder
+	var stdout bytes.Buffer
 	cmd := exec.Command(deployScript, environment)
-	cmd.Stdout = &stdout
+	cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
 	cmd.Stderr = os.Stderr
 
 	updateStatus := func(state string, environmentURL string) error {
