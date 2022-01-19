@@ -1,6 +1,10 @@
 *.test
+.direnv
 /github-deploy
 
 # Nix
 result
 result-*
+
+# Generated pre-commit config
+.pre-commit-config.yaml
