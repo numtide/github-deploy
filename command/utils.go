@@ -6,9 +6,9 @@ import (
 	"regexp"
 
 	"github.com/google/go-github/github"
-	"github.com/zimbatm/go-secretvalue"
+	secretvalue "github.com/zimbatm/go-secretvalue"
 	"golang.org/x/oauth2"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 func githubClient(ctx context.Context, c *cli.Context) *github.Client {
@@ -27,14 +27,16 @@ func githubClient(ctx context.Context, c *cli.Context) *github.Client {
 	return github.NewClient(tc)
 }
 
-var ReSlug = regexp.MustCompile("[:/]([\\w-]+)/([\\w-]+)")
+var ReSlug = regexp.MustCompile(`[:/]([\w-]+)/([\w-]+)`)
 
 func githubSlug(c *cli.Context) (string, string) {
 	origin := c.GlobalString("git-origin")
 	matches := ReSlug.FindStringSubmatch(origin)
+
 	if len(matches) < 3 {
 		return "", ""
 	}
+
 	return matches[1], matches[2]
 }
 
@@ -51,6 +53,7 @@ const (
 func refBool(b bool) *bool {
 	return &b
 }
+
 func refString(str string) *string {
 	return &str
 }

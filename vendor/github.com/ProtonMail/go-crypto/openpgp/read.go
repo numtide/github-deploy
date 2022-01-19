@@ -370,25 +370,11 @@ func (scr *signatureCheckReader) Read(buf []byte) (int, error) {
 
 				// If signature KeyID matches
 				if scr.md.SignedBy != nil && *sig.IssuerKeyId == scr.md.SignedByKeyId {
-					key := scr.md.SignedBy
-					signatureError := key.PublicKey.VerifySignature(scr.h, sig)
-					if signatureError == nil {
-						now := scr.config.Now()
-						if key.Revoked(now) ||
-							key.Entity.Revoked(now) || // primary key is revoked (redundant if key is the primary key)
-							key.Entity.PrimaryIdentity().Revoked(now) {
-							signatureError = errors.ErrKeyRevoked
-						}
-						if sig.SigExpired(now) {
-							signatureError = errors.ErrSignatureExpired
-						}
-						if key.PublicKey.KeyExpired(key.SelfSignature, now) ||
-							key.SelfSignature.SigExpired(now) {
-							signatureError = errors.ErrKeyExpired
-						}
-					}
 					scr.md.Signature = sig
-					scr.md.SignatureError = signatureError
+					scr.md.SignatureError = scr.md.SignedBy.PublicKey.VerifySignature(scr.h, scr.md.Signature)
+					if scr.md.SignatureError == nil && scr.md.Signature.SigExpired(scr.config.Now()) {
+						scr.md.SignatureError = errors.ErrSignatureExpired
+					}
 				} else {
 					scr.md.UnverifiedSignatures = append(scr.md.UnverifiedSignatures, sig)
 				}
@@ -497,16 +483,10 @@ func CheckDetachedSignatureAndHash(keyring KeyRing, signed, signature io.Reader,
 		err = key.PublicKey.VerifySignature(h, sig)
 		if err == nil {
 			now := config.Now()
-			if key.Revoked(now) ||
-				key.Entity.Revoked(now) || // primary key is revoked (redundant if key is the primary key)
-				key.Entity.PrimaryIdentity().Revoked(now) {
-				return key.Entity, errors.ErrKeyRevoked
-			}
 			if sig.SigExpired(now) {
 				return key.Entity, errors.ErrSignatureExpired
 			}
-			if key.PublicKey.KeyExpired(key.SelfSignature, now) ||
-				key.SelfSignature.SigExpired(now) {
+			if key.PublicKey.KeyExpired(key.SelfSignature, now) {
 				return key.Entity, errors.ErrKeyExpired
 			}
 			return key.Entity, nil

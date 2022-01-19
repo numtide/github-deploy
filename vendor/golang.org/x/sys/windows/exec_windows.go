@@ -78,40 +78,6 @@ func EscapeArg(s string) string {
 	return string(qs[:j])
 }
 
-// ComposeCommandLine escapes and joins the given arguments suitable for use as a Windows command line,
-// in CreateProcess's CommandLine argument, CreateService/ChangeServiceConfig's BinaryPathName argument,
-// or any program that uses CommandLineToArgv.
-func ComposeCommandLine(args []string) string {
-	var commandLine string
-	for i := range args {
-		if i > 0 {
-			commandLine += " "
-		}
-		commandLine += EscapeArg(args[i])
-	}
-	return commandLine
-}
-
-// DecomposeCommandLine breaks apart its argument command line into unescaped parts using CommandLineToArgv,
-// as gathered from GetCommandLine, QUERY_SERVICE_CONFIG's BinaryPathName argument, or elsewhere that
-// command lines are passed around.
-func DecomposeCommandLine(commandLine string) ([]string, error) {
-	if len(commandLine) == 0 {
-		return []string{}, nil
-	}
-	var argc int32
-	argv, err := CommandLineToArgv(StringToUTF16Ptr(commandLine), &argc)
-	if err != nil {
-		return nil, err
-	}
-	defer LocalFree(Handle(unsafe.Pointer(argv)))
-	var args []string
-	for _, v := range (*argv)[:argc] {
-		args = append(args, UTF16ToString((*v)[:]))
-	}
-	return args, nil
-}
-
 func CloseOnExec(fd Handle) {
 	SetHandleInformation(Handle(fd), HANDLE_FLAG_INHERIT, 0)
 }
@@ -135,8 +101,8 @@ func FullPath(name string) (path string, err error) {
 	}
 }
 
-// NewProcThreadAttributeList allocates a new ProcThreadAttributeListContainer, with the requested maximum number of attributes.
-func NewProcThreadAttributeList(maxAttrCount uint32) (*ProcThreadAttributeListContainer, error) {
+// NewProcThreadAttributeList allocates a new ProcThreadAttributeList, with the requested maximum number of attributes.
+func NewProcThreadAttributeList(maxAttrCount uint32) (*ProcThreadAttributeList, error) {
 	var size uintptr
 	err := initializeProcThreadAttributeList(nil, maxAttrCount, 0, &size)
 	if err != ERROR_INSUFFICIENT_BUFFER {
@@ -145,13 +111,10 @@ func NewProcThreadAttributeList(maxAttrCount uint32) (*ProcThreadAttributeListCo
 		}
 		return nil, err
 	}
-	alloc, err := LocalAlloc(LMEM_FIXED, uint32(size))
-	if err != nil {
-		return nil, err
-	}
+	const psize = unsafe.Sizeof(uintptr(0))
 	// size is guaranteed to be ≥1 by InitializeProcThreadAttributeList.
-	al := &ProcThreadAttributeListContainer{data: (*ProcThreadAttributeList)(unsafe.Pointer(alloc))}
-	err = initializeProcThreadAttributeList(al.data, maxAttrCount, 0, &size)
+	al := (*ProcThreadAttributeList)(unsafe.Pointer(&make([]unsafe.Pointer, (size+psize-1)/psize)[0]))
+	err = initializeProcThreadAttributeList(al, maxAttrCount, 0, &size)
 	if err != nil {
 		return nil, err
 	}
@@ -159,20 +122,11 @@ func NewProcThreadAttributeList(maxAttrCount uint32) (*ProcThreadAttributeListCo
 }
 
 // Update modifies the ProcThreadAttributeList using UpdateProcThreadAttribute.
-func (al *ProcThreadAttributeListContainer) Update(attribute uintptr, value unsafe.Pointer, size uintptr) error {
-	al.pointers = append(al.pointers, value)
-	return updateProcThreadAttribute(al.data, 0, attribute, value, size, nil, nil)
+func (al *ProcThreadAttributeList) Update(attribute uintptr, flags uint32, value unsafe.Pointer, size uintptr, prevValue unsafe.Pointer, returnedSize *uintptr) error {
+	return updateProcThreadAttribute(al, flags, attribute, value, size, prevValue, returnedSize)
 }
 
 // Delete frees ProcThreadAttributeList's resources.
-func (al *ProcThreadAttributeListContainer) Delete() {
-	deleteProcThreadAttributeList(al.data)
-	LocalFree(Handle(unsafe.Pointer(al.data)))
-	al.data = nil
-	al.pointers = nil
-}
-
-// List returns the actual ProcThreadAttributeList to be passed to StartupInfoEx.
-func (al *ProcThreadAttributeListContainer) List() *ProcThreadAttributeList {
-	return al.data
+func (al *ProcThreadAttributeList) Delete() {
+	deleteProcThreadAttributeList(al)
 }

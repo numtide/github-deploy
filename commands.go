@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zimbatm/github-deploy/command"
+	command "github.com/zimbatm/github-deploy/command"
 	secretvalue "github.com/zimbatm/go-secretvalue"
 	cli "gopkg.in/urfave/cli.v1"
 	"gopkg.in/urfave/cli.v1/altsrc"
@@ -98,7 +98,7 @@ var Commands = []cli.Command{
 	},
 }
 
-func CommandNotFound(c *cli.Context, command string) {
-	fmt.Fprintf(os.Stderr, "%s: '%s' is not a %s command. See '%s --help'.", c.App.Name, command, c.App.Name, c.App.Name)
+func CommandNotFound(c *cli.Context, cmd string) {
+	fmt.Fprintf(os.Stderr, "%s: '%s' is not a %s command. See '%s --help'.", c.App.Name, cmd, c.App.Name, c.App.Name)
 	os.Exit(2)
 }

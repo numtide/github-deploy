@@ -15,16 +15,20 @@ import (
 )
 
 func CmdCleanup(c *cli.Context) (err error) {
-	owner, repo := githubSlug(c)
 	listScript := c.String("list-script")
 	selectedPullRequest := c.StringSlice("pull-request")
+
 	if listScript == "" && len(selectedPullRequest) == 0 {
-		return errors.New("`--list-script` or `--pull-request` missing. You have to define one or the other to select the PRs to cleanup !")
+		return errors.New("`--list-script` or `--pull-request` missing." +
+			"You have to define one or the other to select the PRs to cleanup")
 	}
-	ctx := context.Background()
-	gh := githubClient(ctx, c)
 
 	var toUndeploy []string
+
+	ctx := context.Background()
+	ghCli := githubClient(ctx, c)
+	owner, repo := githubSlug(c)
+
 	if len(selectedPullRequest) > 0 {
 		// undeploy only selected pull requests
 		toUndeploy = selectedPullRequest
@@ -37,7 +41,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 		}
 
 		// Get the list of open PRs
-		prs, _, err := gh.PullRequests.List(ctx, owner, repo, &github.PullRequestListOptions{
+		prs, _, err := ghCli.PullRequests.List(ctx, owner, repo, &github.PullRequestListOptions{
 			State: "open",
 		})
 		if err != nil {
@@ -56,24 +60,31 @@ func CmdCleanup(c *cli.Context) (err error) {
 			}
 		}
 	}
+
 	log.Println("to undeploy:", toUndeploy)
 
 	for _, name := range toUndeploy {
 		log.Println("Undeploying", name)
-		cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...)
+
+		cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...) //#nosec
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+
 		err = cmd.Run()
 		if err != nil {
 			log.Println("undeploy error: ", err)
+
 			continue
 		}
-		pullRequestId, err := strconv.Atoi(name)
+
+		pullRequestID, err := strconv.Atoi(name)
 		if err != nil {
 			log.Println("Unable to parse pull request id: ", name)
+
 			continue
 		}
-		destroyGitHubDeployments(ctx, gh, owner, repo, pullRequestId)
+
+		destroyGitHubDeployments(ctx, ghCli, owner, repo, pullRequestID)
 	}
 
 	return nil
@@ -85,50 +96,59 @@ func contains(item string, list []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
-// Get the list of deployed Pull request based on given script
+// Get the list of deployed Pull request based on given script.
 func listDeployedPullRequests(listScript string) ([]string, error) {
 	var stdout strings.Builder
+
 	cmd := exec.Command(listScript)
 	cmd.Stdout = &stdout
-	err := cmd.Run()
-	if err != nil {
+
+	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
-	var deployed []string
-	for _, line := range strings.Split(stdout.String(), "\n") {
+
+	lines := strings.Split(stdout.String(), "\n")
+	deployed := make([]string, 0, len(lines))
+
+	for _, line := range lines {
 		if line == "" {
 			continue
 		}
 
 		deployed = append(deployed, line)
 	}
+
 	log.Println("deployed:", deployed)
+
 	return deployed, nil
 }
 
-// destroy deployments related to a PR by marking them
-func destroyGitHubDeployments(ctx context.Context, gh *github.Client, owner string, repo string, pullRequestId int) {
-	pr, _, err := gh.PullRequests.Get(ctx, owner, repo, pullRequestId)
+// Destroy deployments related to a PR by marking them.
+func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner string, repo string, pullRequestID int) {
+	pr, _, err := ghCli.PullRequests.Get(ctx, owner, repo, pullRequestID)
 	if err != nil {
-		log.Fatalf("Unable to fetch from github pull request id: %d", pullRequestId)
+		log.Fatalf("Unable to fetch from github pull request id: %d", pullRequestID)
 	}
 
 	// Look for an existing deployments
 	// We filter deployments related to a PR based on the PR head branch name (as the `deploy` creates them)
-	deployments, _, err := gh.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
+	deployments, _, err := ghCli.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
 		Ref:  fmt.Sprintf("refs/heads/%s", *pr.Head.Ref),
 		Task: TaskName,
 	})
 	if err != nil || len(deployments) == 0 {
 		log.Println("unable to find deployments related to PR ", pr.ID)
 	}
+
 	for _, deployment := range deployments {
-		_, _, err := gh.Repositories.CreateDeploymentStatus(ctx, owner, repo, *deployment.ID, &github.DeploymentStatusRequest{
-			State: refString("inactive"),
-		})
+		_, _, err := ghCli.Repositories.CreateDeploymentStatus(ctx, owner, repo,
+			*deployment.ID, &github.DeploymentStatusRequest{
+				State: refString("inactive"),
+			})
 		if err != nil {
 			log.Println("Error while inactivating deployment for PR:", pr.ID)
 		}

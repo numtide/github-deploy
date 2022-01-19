@@ -19,25 +19,17 @@ import (
 const TaskName = "github-deploy"
 
 func CmdPlease(c *cli.Context) (err error) {
-	owner, repo := githubSlug(c)
 	deployScript := c.String("deploy-script")
-	environment := c.String("environment")
-	logURL := c.String("build-url")
-	prStr := c.String("pull-request")
-	commit := c.GlobalString("git-commit")
-	branch := c.GlobalString("git-branch")
-	commitRef := c.GlobalBool("git-ref-commit")
-	origin := c.GlobalString("git-origin")
-	environmentURL := c.String("environment-url")
-
 	if deployScript != "" {
 		return fmt.Errorf("--deploy-script is deprecated, use a positional argument instead")
 	}
+
 	if c.NArg() == 0 {
-		return fmt.Errorf("Missing the deploy script as a positional argument")
+		return fmt.Errorf("missing the deploy script as a positional argument")
 	}
 
 	// Compose the Git originl URL in the case of GitHub Actions
+	origin := c.GlobalString("git-origin")
 	if origin == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
 		origin = fmt.Sprintf(
 			"%s/%s.git",
@@ -47,6 +39,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Compose the log URL in the case of GitHub Actions
+	logURL := c.String("build-url")
 	if logURL == "" && os.Getenv("GITHUB_SERVER_URL") != "" {
 		logURL = fmt.Sprintf(
 			"%s/%s/actions/runs/%s",
@@ -56,23 +49,29 @@ func CmdPlease(c *cli.Context) (err error) {
 		)
 	}
 
-	ref := ""
+	var ref string
 
+	branch := c.GlobalString("git-branch")
+	commit := c.GlobalString("git-commit")
+
+	commitRef := c.GlobalBool("git-ref-commit")
 	if commitRef {
 		if commit == "" {
-			return errors.New("Trying to use commit as ref but commit is not set")
-		} else {
-			ref = commit
+			return errors.New("trying to use commit as ref but commit is not set")
 		}
+
+		ref = commit
 	} else {
 		if branch == "" {
-			return errors.New("Trying to use branch as ref but branch is not set")
-		} else {
-			ref = branch
+			return errors.New("trying to use branch as ref but branch is not set")
 		}
+
+		ref = branch
 	}
 
 	var pr int
+
+	prStr := c.String("pull-request")
 	if prStr != "" && prStr != "false" {
 		// prStr might be a URL, in that case pull the last component of the path
 		strs := strings.Split(prStr, "/")
@@ -85,12 +84,13 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Override the deployment target on pull-request
+	environment := c.String("environment")
 	if pr > 0 {
 		environment = fmt.Sprintf("pr-%d", pr)
 	}
 
 	ctx := context.Background()
-	gh := githubClient(ctx, c)
+	ghCli := githubClient(ctx, c)
 
 	log.Println("deploy ref", ref)
 	log.Println("origin", origin)
@@ -98,18 +98,21 @@ func CmdPlease(c *cli.Context) (err error) {
 	// First, declare the new deployment to GitHub
 
 	// Look for an existing deployment
-	deployments, _, err := gh.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
+	owner, repo := githubSlug(c)
+
+	deployments, _, err := ghCli.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
 		Ref:  ref,
 		Task: TaskName,
 	})
 	if err != nil {
 		return err
 	}
+
 	var deployment *github.Deployment
 	if len(deployments) > 0 {
 		deployment = deployments[0]
 	} else {
-		deployment, _, err = gh.Repositories.CreateDeployment(ctx, owner, repo, &github.DeploymentRequest{
+		deployment, _, err = ghCli.Repositories.CreateDeployment(ctx, owner, repo, &github.DeploymentRequest{
 			Ref:                   refString(ref),
 			Task:                  refString(TaskName),
 			AutoMerge:             refBool(false),
@@ -123,28 +126,26 @@ func CmdPlease(c *cli.Context) (err error) {
 		if err != nil {
 			return err
 		}
-
-	}
-
-	deployScriptSubStrings := strings.Fields(deployScript)
-	if len(deployScriptSubStrings) == 1 {
-		deployScriptSubStrings = append(deployScriptSubStrings, environment)
 	}
 
 	// Prepare deploy script
 	var stdout bytes.Buffer
-	cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...)
+
+	cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...) //#nosec
 	cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
 	cmd.Stderr = os.Stderr
 
+	environmentURL := c.String("environment-url")
 	updateStatus := func(state string, environmentURL string) error {
-		_, _, err := gh.Repositories.CreateDeploymentStatus(ctx, owner, repo, *deployment.ID, &github.DeploymentStatusRequest{
-			State:          refString(state),
-			LogURL:         refString(logURL),
-			Description:    refString(TaskName),
-			EnvironmentURL: refString(environmentURL),
-			//AutoInactive: refBool(true),
-		})
+		_, _, err := ghCli.Repositories.CreateDeploymentStatus(ctx, owner,
+			repo, *deployment.ID, &github.DeploymentStatusRequest{
+				State:          refString(state),
+				LogURL:         refString(logURL),
+				Description:    refString(TaskName),
+				EnvironmentURL: refString(environmentURL),
+				// AutoInactive: refBool(true),
+			})
+
 		return err
 	}
 
@@ -155,6 +156,7 @@ func CmdPlease(c *cli.Context) (err error) {
 		if err2 != nil {
 			log.Println("updateStatus:", err)
 		}
+
 		return err
 	}
 
@@ -171,6 +173,7 @@ func CmdPlease(c *cli.Context) (err error) {
 		if err2 != nil {
 			log.Println("updateStatus:", err)
 		}
+
 		return err
 	}
 
@@ -179,6 +182,8 @@ func CmdPlease(c *cli.Context) (err error) {
 	if environmentURL == "" {
 		environmentURL = strings.TrimSpace(out[0])
 	}
+
 	err = updateStatus(StateSuccess, environmentURL)
+
 	return err
 }
