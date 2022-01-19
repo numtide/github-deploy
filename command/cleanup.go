@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/google/go-github/github"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 func CmdCleanup(c *cli.Context) (err error) {
 	owner, repo := githubSlug(c)
 	listScript := c.String("list-script")
-	undeployScript := c.String("undeploy-script")
 	ctx := context.Background()
 	gh := githubClient(ctx, c)
 
@@ -60,7 +60,10 @@ func CmdCleanup(c *cli.Context) (err error) {
 
 	for _, name := range toUndeploy {
 		log.Println("Undeploying", name)
-		err := exec.Command(undeployScript, name).Run()
+		cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
 		if err != nil {
 			log.Println("undeploy error:", err)
 		}
