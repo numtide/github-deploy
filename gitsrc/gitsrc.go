@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-git/go-git/v5"
-	"gopkg.in/urfave/cli.v1"
-	"gopkg.in/urfave/cli.v1/altsrc"
+	git "github.com/go-git/go-git/v5"
+	cli "gopkg.in/urfave/cli.v1"
+	altsrc "gopkg.in/urfave/cli.v1/altsrc"
 )
 
 // ErrNotSupported is returned by all the functions that are not String()
@@ -22,7 +22,7 @@ var ErrNotBranch = errors.New("gitsrc: ref is not a branch")
 
 // FromCurrentDir tries to open $PWD as the git repo
 func FromCurrentDir(*cli.Context) (altsrc.InputSourceContext, error) {
-	r, err := git.PlainOpen(".")
+	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{DetectDotGit: true})
 	return &gitSource{r}, err
 }
 
