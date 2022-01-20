@@ -89,10 +89,6 @@ var Commands = []cli.Command{
 				Name:  "list-script",
 				Usage: "Script that lists the deployed PRs",
 			},
-			cli.StringFlag{
-				Name:  "undeploy-script",
-				Usage: "Script that deleted a deployment given a specific PR",
-			},
 		},
 	},
 }
