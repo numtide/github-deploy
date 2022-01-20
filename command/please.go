@@ -133,7 +133,7 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Prepare deploy script
 	var stdout bytes.Buffer
-	cmd := exec.Command(c.Args().Get(0), c.Args()...)
+	cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...)
 	cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
 	cmd.Stderr = os.Stderr
 
