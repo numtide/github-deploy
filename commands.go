@@ -82,12 +82,17 @@ var Commands = []cli.Command{
 	},
 	{
 		Name:   "cleanup",
-		Usage:  "Removes old temporary deployments",
+		Usage:  "Removes deployments",
 		Action: command.CmdCleanup,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "list-script",
 				Usage: "Script that lists the deployed PRs",
+				Value: "",
+			},
+			cli.StringSliceFlag{
+				Name:  "pr, pull-request",
+				Usage: "Limit cleanup to one or more PRs",
 			},
 		},
 	},
