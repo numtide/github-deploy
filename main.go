@@ -24,8 +24,7 @@ func main() {
 	// Also load info from the current git repo
 	app.Before = altsrc.InitInputSourceWithContext(GlobalFlags, gitsrc.FromCurrentDir)
 
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		log.Fatal("ERROR:", err)
 		os.Exit(1)
 	}

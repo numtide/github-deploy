@@ -1,9 +1,2 @@
-let pkgs = import <nixpkgs> {}; in with pkgs;
-mkShell {
-  buildInputs = [
-    go
-  ];
-  shellHook = ''
-    export GO111MODULE=on
-  '';
-}
+{ system ? builtins.currentSystem }:
+(import ./. { inherit system; }).devShell
