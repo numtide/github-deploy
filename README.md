@@ -26,14 +26,14 @@ USAGE:
    github-deploy [global options] command [command options] [arguments...]
 
 VERSION:
-   0.5.0
+   0.6.0
 
 AUTHOR:
    zimbatm <zimbatm@zimbatm.com>
 
 COMMANDS:
      please   Initiates a deployment
-     cleanup  Removes old temporary deployments
+     cleanup  Removes deployments
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:

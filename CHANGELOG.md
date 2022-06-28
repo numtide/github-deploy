@@ -1,4 +1,20 @@
 
+0.6.0 / 2022-06-28
+==================
+
+  * fix: list existing deployments in the same environment (#14)
+  * feat: switch to flake, add fmt, lint (#13)
+  * feat(cleanup): destroy github deployments related to PR (#12)
+  * feat(cleanup): filter deployments based on a given PR list (#11)
+  * feat(cleanup): handle script arguments (#10)
+  * fix: remove duplicate arguments command (#9)
+  * feat: run from subdirectories in git repo (#8)
+  * feat(please): also display stdout (#6)
+  * feat(please): handle scripts arguments (#7)
+  * Merge pull request #4 from jfroche/feat/provide-environment-url
+  * ci: build/test using different go versions
+  * feat(please): set environment URL using new cli flag
+
 0.5.0 / 2022-01-15
 ==================
 
