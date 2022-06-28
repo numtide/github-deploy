@@ -26,7 +26,7 @@ USAGE:
    github-deploy [global options] command [command options] [arguments...]
 
 VERSION:
-   0.6.0
+   0.6.1
 
 AUTHOR:
    zimbatm <zimbatm@zimbatm.com>

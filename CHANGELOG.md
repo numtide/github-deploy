@@ -1,4 +1,10 @@
 
+0.6.1 / 2022-06-28
+==================
+
+  * ci: bump go versions
+  * add dependabot to automate upgrades
+
 0.6.0 / 2022-06-28
 ==================
 
