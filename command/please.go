@@ -97,12 +97,13 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// First, declare the new deployment to GitHub
 
-	// Look for an existing deployment
+	// Look for an existing deployment in the same environment
 	owner, repo := githubSlug(c)
 
 	deployments, _, err := ghCli.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
-		Ref:  ref,
-		Task: TaskName,
+		Ref:         ref,
+		Task:        TaskName,
+		Environment: environment,
 	})
 	if err != nil {
 		return err
