@@ -134,14 +134,19 @@ func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner s
 		log.Fatalf("Unable to fetch from github pull request id: %d", pullRequestID)
 	}
 
-	// Look for an existing deployments
-	// We filter deployments related to a PR based on the PR head branch name (as the `deploy` creates them)
+	// Look for existing deployments related to the pull request by filtering deployments
+	// by the environment name that matches the pattern 'pr-{pullRequestID}' (as the 'deploy'
+	// action creates deployments with such names).
 	deployments, _, err := ghCli.Repositories.ListDeployments(ctx, owner, repo, &github.DeploymentsListOptions{
-		Ref:  fmt.Sprintf("refs/heads/%s", *pr.Head.Ref),
-		Task: TaskName,
+		Task:        TaskName,
+		Environment: fmt.Sprintf("pr-%d", pullRequestID),
 	})
-	if err != nil || len(deployments) == 0 {
-		log.Println("unable to find deployments related to PR ", pr.ID)
+	if err != nil {
+		log.Fatalf("Error while listing deployments for PR %d", pr.Number)
+	}
+
+	if len(deployments) == 0 {
+		log.Fatalf("unable to find deployments related to PR %d", pr.Number)
 	}
 
 	for _, deployment := range deployments {
