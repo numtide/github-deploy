@@ -21,7 +21,7 @@ var ErrNotFound = errors.New("gitsrc: key not found")
 var ErrNotBranch = errors.New("gitsrc: ref is not a branch")
 
 // FromCurrentDir tries to open $PWD as the git repo.
-func FromCurrentDir(*cli.Context) (altsrc.InputSourceContext, error) { //nolint:ireturn
+func FromCurrentDir(*cli.Context) (altsrc.InputSourceContext, error) { //nolint:nolintlint,ireturn
 	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{DetectDotGit: true})
 
 	return &gitSource{r}, err
@@ -89,7 +89,7 @@ func (x *gitSource) IntSlice(name string) ([]int, error) {
 	return nil, ErrNotSupported
 }
 
-func (x *gitSource) Generic(name string) (cli.Generic, error) { //nolint:ireturn
+func (x *gitSource) Generic(name string) (cli.Generic, error) { //nolint:nolintlint,ireturn
 	return nil, ErrNotSupported
 }
 
