@@ -94,6 +94,10 @@ var Commands = []cli.Command{
 				Name:  "pr, pull-request",
 				Usage: "Limit cleanup to one or more PRs",
 			},
+			cli.BoolFlag{
+				Name:  "ignore-missing",
+				Usage: "Don't consider it a failure if no deployment is found",
+			},
 		},
 	},
 }
