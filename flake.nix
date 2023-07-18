@@ -22,7 +22,7 @@
       with pkgs;
       {
         devShell = github-deploy.devShell;
-        packages.${name} = github-deploy;
+        packages.${name} = github-deploy.github-deploy;
         defaultPackage = github-deploy.defaultPackage;
       }
     );
