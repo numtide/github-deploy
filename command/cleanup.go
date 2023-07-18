@@ -17,6 +17,7 @@ import (
 func CmdCleanup(c *cli.Context) (err error) {
 	listScript := c.String("list-script")
 	selectedPullRequest := c.StringSlice("pull-request")
+	ignoreMissing := c.Bool("ignore-missing")
 
 	if listScript == "" && len(selectedPullRequest) == 0 {
 		return errors.New("`--list-script` or `--pull-request` missing." +
@@ -84,7 +85,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 			continue
 		}
 
-		destroyGitHubDeployments(ctx, ghCli, owner, repo, pullRequestID)
+		destroyGitHubDeployments(ctx, ghCli, owner, repo, pullRequestID, ignoreMissing)
 	}
 
 	return nil
@@ -128,12 +129,9 @@ func listDeployedPullRequests(listScript string) ([]string, error) {
 }
 
 // Destroy deployments related to a PR by marking them.
-func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner string, repo string, pullRequestID int) {
-	pr, _, err := ghCli.PullRequests.Get(ctx, owner, repo, pullRequestID)
-	if err != nil {
-		log.Fatalf("Unable to fetch from github pull request id: %d", pullRequestID)
-	}
-
+func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner string, repo string, pullRequestID int,
+	ignoreMissing bool,
+) {
 	// Look for existing deployments related to the pull request by filtering deployments
 	// by the environment name that matches the pattern 'pr-{pullRequestID}' (as the 'deploy'
 	// action creates deployments with such names).
@@ -142,11 +140,15 @@ func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner s
 		Environment: fmt.Sprintf("pr-%d", pullRequestID),
 	})
 	if err != nil {
-		log.Fatalf("Error while listing deployments for PR %d", pr.Number)
+		log.Fatalf("Error while listing deployments for PR %d", pullRequestID)
 	}
 
 	if len(deployments) == 0 {
-		log.Fatalf("unable to find deployments related to PR %d", pr.Number)
+		if ignoreMissing {
+			log.Println("No deployments found for PR ", pullRequestID)
+		} else {
+			log.Fatalf("unable to find deployments related to PR %d", pullRequestID)
+		}
 	}
 
 	for _, deployment := range deployments {
@@ -155,7 +157,7 @@ func destroyGitHubDeployments(ctx context.Context, ghCli *github.Client, owner s
 				State: refString("inactive"),
 			})
 		if err != nil {
-			log.Println("Error while inactivating deployment for PR:", pr.ID)
+			log.Println("Error while inactivating deployment for PR ", pullRequestID)
 		}
 	}
 }
