@@ -6,7 +6,7 @@ require (
 	github.com/go-git/go-git/v5 v5.9.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/zimbatm/go-secretvalue v0.0.0-20190429145844-f5f44e7f9f16
-	golang.org/x/oauth2 v0.12.0
+	golang.org/x/oauth2 v0.15.0
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
 
@@ -30,10 +30,10 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/crypto v0.13.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.15.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
