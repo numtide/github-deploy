@@ -3,7 +3,7 @@ module github.com/zimbatm/github-deploy
 go 1.19
 
 require (
-	github.com/go-git/go-git/v5 v5.10.1
+	github.com/go-git/go-git/v5 v5.11.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/zimbatm/go-secretvalue v0.0.0-20190429145844-f5f44e7f9f16
 	golang.org/x/oauth2 v0.15.0
