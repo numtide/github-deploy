@@ -7,7 +7,6 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
-        pkgs = import nixpkgs { inherit system; };
         github-deploy = import self {
           inherit system;
           inputs = null;
@@ -15,7 +14,6 @@
         };
         name = "github-deploy";
       in
-      with pkgs;
       {
         devShell = github-deploy.devShell;
         packages.${name} = github-deploy.github-deploy;
