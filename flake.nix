@@ -18,6 +18,8 @@
         devShell = github-deploy.devShell;
         packages.${name} = github-deploy.github-deploy;
         defaultPackage = github-deploy.defaultPackage;
+
+        checks.${name} = github-deploy.github-deploy;
       }
     );
 }
