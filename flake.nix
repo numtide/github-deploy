@@ -17,10 +17,10 @@
       {
         devShell = github-deploy.devShell;
         packages.${name} = github-deploy.github-deploy;
+        packages.default = self.packages.${system}.github-deploy;
         defaultPackage = github-deploy.defaultPackage;
 
         checks.${name} = github-deploy.github-deploy;
       }
     );
 }
-
