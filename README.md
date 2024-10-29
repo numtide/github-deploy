@@ -85,7 +85,7 @@ TODO example
 
 ## Contribution
 
-1. Fork ([https://github.com/okeamah/github-deploy/fork](https://github.com/zimbatm/github-deploy/fork))
+1. Fork ([https://github.com/okeamah/github-deploy/fork](https://github.com/okeamah/github-deploy/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the main branch
