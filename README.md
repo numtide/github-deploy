@@ -66,7 +66,7 @@ Deletes a deployment named `<TARGET>`. Should not undeploy production.
 To install, use `go get`:
 
 ```bash
-$ go get -d github.com/zimbatm/github-deploy
+$ go get -d github.com/okeamah/github-deploy
 ```
 
 ## Setup
@@ -85,7 +85,7 @@ TODO example
 
 ## Contribution
 
-1. Fork ([https://github.com/zimbatm/github-deploy/fork](https://github.com/zimbatm/github-deploy/fork))
+1. Fork ([https://github.com/okeamah/github-deploy/fork](https://github.com/zimbatm/github-deploy/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the main branch
@@ -95,8 +95,28 @@ TODO example
 
 ## Author
 
-[zimbatm](https://github.com/zimbatm)
+[okeamah](https://github.com/okeamah)
 
 ## License
 
 MIT
+            - name: Azure Resource Manager (ARM) Template Deployment
+  # You may pin to the exact commit or the version.
+  # uses: whiteducksoftware/azure-arm-action@9bae2e95df87dbd4acae11deb0765be7256fd141
+  uses: whiteducksoftware/azure-arm-action@v3.3
+  with:
+    # Paste output of `az ad sp create-for-rbac -o json` as value of secret variable: AZURE_CREDENTIALS
+    creds: 
+    # Provide the name of a resource group.
+    resourceGroupName: 
+    # Specify the path to the Azure Resource Manager template.
+    templateLocation: 
+    # Specifies the name of the resource group deployment to create.
+    deploymentName: 
+    # Incremental (only add resources to resource group) or Complete (remove extra resources from resource group).
+    deploymentMode: # optional, default is Incremental
+    # Specify either path to the Azure Resource Manager parameters file or pass them as 'key1=value1;key2=value2;...'.
+    parameters: # optional
+    # Specify either path to the Azure Resource Manager override parameters file or pass them as 'key1=value1;key2=value2;...'.
+    overrideParameters: # optional
+          
