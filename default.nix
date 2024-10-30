@@ -1,25 +1,24 @@
-{ system ? builtins.currentSystem
-, inputs ? import ./flake.lock.nix { }
-, nixpkgs ? import inputs.nixpkgs {
+{
+  system ? builtins.currentSystem,
+  inputs ? import ./flake.lock.nix { },
+  nixpkgs ? import inputs.nixpkgs {
     inherit system;
     # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
     config = { };
     overlays = [ ];
-  }
-, buildGoPackage ? nixpkgs.buildGoPackage
+  },
+  buildGoModule ? nixpkgs.buildGoModule,
 }:
 let
-  versionFile = builtins.readFile ./version.go;
-  versionMatch = builtins.match ".*\"([0-9]+\\.[0-9]+\\.[0-9]+)\".*" versionFile;
-  version = builtins.head versionMatch;
-  github-deploy = buildGoPackage
-    rec {
-      name = "github-deploy-${version}";
-      goPackagePath = "github.com/zimbatm/github-deploy";
-      src = nixpkgs.lib.cleanSource ./.;
-      # FIXME: for some reason the go reference rewrites are failing
-      allowGoReference = true;
-    };
+  inherit (nixpkgs) lib;
+  versionFile = lib.readFile ./version.go;
+  versionMatch = lib.match ".*\"([0-9]+\\.[0-9]+\\.[0-9]+)\".*" versionFile;
+  version = lib.head versionMatch;
+  github-deploy = buildGoModule {
+    name = "github-deploy-${version}";
+    src = nixpkgs.lib.cleanSource ./.;
+    vendorHash = "sha256-vcm3UhqwiUCdope9TpfO/CQQsxM0eh8nhvOCv4bGCng=";
+  };
 in
 {
   inherit github-deploy;
