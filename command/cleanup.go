@@ -36,6 +36,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 	} else {
 		// undeploy all closed pull requests
 		var deployed []string
+
 		deployed, err = listDeployedPullRequests(listScript)
 		if err != nil {
 			return err
@@ -48,10 +49,13 @@ func CmdCleanup(c *cli.Context) (err error) {
 		if err != nil {
 			return err
 		}
+
 		openPRs := make([]string, len(prs))
+
 		for i, pr := range prs {
 			openPRs[i] = fmt.Sprintf("pr-%d", *pr.Number)
 		}
+
 		log.Println("open PRs:", openPRs)
 
 		// Now get a list of all the deployed PRs that are not open
@@ -72,7 +76,9 @@ func CmdCleanup(c *cli.Context) (err error) {
 		pullRequestID, err := strconv.Atoi(name)
 		if err != nil {
 			log.Println("Unable to parse pull request id: ", name)
+
 			lastErr = err
+
 			continue
 		}
 
@@ -83,7 +89,9 @@ func CmdCleanup(c *cli.Context) (err error) {
 		err = cmd.Run()
 		if err != nil {
 			log.Println("undeploy error: ", err)
+
 			lastErr = err
+
 			continue
 		}
 

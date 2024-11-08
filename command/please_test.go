@@ -2,6 +2,6 @@ package command_test
 
 import "testing"
 
-func TestCmdPlease(t *testing.T) {
+func TestCmdPlease(_ *testing.T) {
 	// Write your code here
 }

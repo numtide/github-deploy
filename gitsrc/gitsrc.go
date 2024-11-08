@@ -69,34 +69,34 @@ func (x *gitSource) String(name string) (string, error) {
 
 // These are implemented to satisfy the altsrc.InputSourceContext interface
 
-func (x *gitSource) Int(name string) (int, error) {
+func (x *gitSource) Int(_ string) (int, error) {
 	return 0, ErrNotSupported
 }
 
-func (x *gitSource) Duration(name string) (time.Duration, error) {
+func (x *gitSource) Float64(_ string) (float64, error) {
 	return 0, ErrNotSupported
 }
 
-func (x *gitSource) Float64(name string) (float64, error) {
+func (x *gitSource) Duration(_ string) (time.Duration, error) {
 	return 0, ErrNotSupported
 }
 
-func (x *gitSource) StringSlice(name string) ([]string, error) {
+func (x *gitSource) StringSlice(_ string) ([]string, error) {
 	return nil, ErrNotSupported
 }
 
-func (x *gitSource) IntSlice(name string) ([]int, error) {
+func (x *gitSource) IntSlice(_ string) ([]int, error) {
 	return nil, ErrNotSupported
 }
 
-func (x *gitSource) Generic(name string) (cli.Generic, error) { //nolint:nolintlint,ireturn
+func (x *gitSource) Generic(_ string) (cli.Generic, error) { //nolint:nolintlint,ireturn
 	return nil, ErrNotSupported
 }
 
-func (x *gitSource) Bool(name string) (bool, error) {
+func (x *gitSource) Bool(_ string) (bool, error) {
 	return false, ErrNotSupported
 }
 
-func (x *gitSource) BoolT(name string) (bool, error) {
+func (x *gitSource) BoolT(_ string) (bool, error) {
 	return false, ErrNotSupported
 }
