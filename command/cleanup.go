@@ -64,8 +64,17 @@ func CmdCleanup(c *cli.Context) (err error) {
 
 	log.Println("to undeploy:", toUndeploy)
 
+	var lastErr error
+
 	for _, name := range toUndeploy {
 		log.Println("Undeploying", name)
+
+		pullRequestID, err := strconv.Atoi(name)
+		if err != nil {
+			log.Println("Unable to parse pull request id: ", name)
+			lastErr = err
+			continue
+		}
 
 		cmd := exec.Command(c.Args().Get(0), c.Args()[1:]...) //#nosec
 		cmd.Stdout = os.Stdout
@@ -74,21 +83,14 @@ func CmdCleanup(c *cli.Context) (err error) {
 		err = cmd.Run()
 		if err != nil {
 			log.Println("undeploy error: ", err)
-
-			continue
-		}
-
-		pullRequestID, err := strconv.Atoi(name)
-		if err != nil {
-			log.Println("Unable to parse pull request id: ", name)
-
+			lastErr = err
 			continue
 		}
 
 		destroyGitHubDeployments(ctx, ghCli, owner, repo, pullRequestID, ignoreMissing)
 	}
 
-	return nil
+	return lastErr
 }
 
 func contains(item string, list []string) bool {
