@@ -2,7 +2,6 @@ package command
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -89,7 +88,7 @@ func CmdPlease(c *cli.Context) (err error) {
 		environment = fmt.Sprintf("pr-%d", pr)
 	}
 
-	ctx := context.Background()
+	ctx := contextWithHandler()
 	ghCli := githubClient(ctx, c)
 
 	log.Println("deploy ref", ref)
@@ -168,7 +167,7 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Wait on the deploy to finish
-	err = cmd.Wait()
+	err = waitOrStop(ctx, cmd)
 	if err != nil {
 		err2 := updateStatus(StateFailure, "")
 		if err2 != nil {
