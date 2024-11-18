@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 	"log"
+	"os"
+	"os/exec"
 	"regexp"
 
 	"github.com/google/go-github/github"
@@ -60,4 +62,18 @@ func refString(str string) *string {
 
 func refStringList(l []string) *[]string {
 	return &l
+}
+
+func propagateSignalsTo(cmd *exec.Cmd, signalChannel chan os.Signal) {
+	for sig := range signalChannel {
+		if cmd.Process != nil {
+			err := cmd.Process.Signal(sig)
+			if err != nil {
+				log.Printf("error sending signal to child process (%d): %s\n", cmd.Process.Pid, err)
+			}
+		} else {
+			// TODO: is this always the right thing to do if we're not running a subprocess?
+			os.Exit(1)
+		}
+	}
 }

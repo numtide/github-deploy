@@ -7,8 +7,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/google/go-github/github"
 	cli "gopkg.in/urfave/cli.v1"
@@ -86,7 +88,12 @@ func CmdCleanup(c *cli.Context) (err error) {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
+		signalChannel := make(chan os.Signal, 1)
+		signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+		go propagateSignalsTo(cmd, signalChannel)
+
 		err = cmd.Run()
+		signal.Stop(signalChannel)
 		if err != nil {
 			log.Println("undeploy error: ", err)
 
@@ -118,7 +125,13 @@ func listDeployedPullRequests(listScript string) ([]string, error) {
 	cmd := exec.Command(listScript)
 	cmd.Stdout = &stdout
 
-	if err := cmd.Run(); err != nil {
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	go propagateSignalsTo(cmd, signalChannel)
+
+	err := cmd.Run()
+	signal.Stop(signalChannel)
+	if err != nil {
 		return nil, err
 	}
 

@@ -9,8 +9,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/google/go-github/github"
 	cli "gopkg.in/urfave/cli.v1"
@@ -151,6 +153,10 @@ func CmdPlease(c *cli.Context) (err error) {
 	}
 
 	// Start deploy script
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	go propagateSignalsTo(cmd, signalChannel)
+
 	err = cmd.Start()
 	if err != nil {
 		err2 := updateStatus(StateError, "")
@@ -169,6 +175,8 @@ func CmdPlease(c *cli.Context) (err error) {
 
 	// Wait on the deploy to finish
 	err = cmd.Wait()
+	signal.Stop(signalChannel)
+
 	if err != nil {
 		err2 := updateStatus(StateFailure, "")
 		if err2 != nil {
