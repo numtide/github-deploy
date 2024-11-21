@@ -18,6 +18,7 @@ git commit checked out.
 ## Usage
 
 `$ ./github-deploy --help`
+
 ```
 NAME:
    github-deploy - A CLI that integrates deployments with github
@@ -26,7 +27,7 @@ USAGE:
    github-deploy [global options] command [command options] [arguments...]
 
 VERSION:
-   0.6.1
+   0.6.2
 
 AUTHOR:
    zimbatm <zimbatm@zimbatm.com>

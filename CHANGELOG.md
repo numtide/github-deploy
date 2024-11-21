@@ -1,4 +1,13 @@
 
+0.6.2 / 2024-11-21
+==================
+
+  * feat: handle graceful shutdown (#64)
+  * fix: expose cleanup errors (#62)
+  * feat: add option to ignore missing deployment (#33)
+  * fix(cleanup): inactivate all deployment related to PR environment
+  * chore: lots of nix and go module updates
+
 0.6.1 / 2022-06-28
 ==================
 
