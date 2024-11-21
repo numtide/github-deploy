@@ -26,7 +26,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 
 	var toUndeploy []string
 
-	ctx := context.Background()
+	ctx := contextWithHandler()
 	ghCli := githubClient(ctx, c)
 	owner, repo := githubSlug(c)
 
@@ -37,7 +37,7 @@ func CmdCleanup(c *cli.Context) (err error) {
 		// undeploy all closed pull requests
 		var deployed []string
 
-		deployed, err = listDeployedPullRequests(listScript)
+		deployed, err = listDeployedPullRequests(ctx, listScript)
 		if err != nil {
 			return err
 		}
@@ -86,13 +86,36 @@ func CmdCleanup(c *cli.Context) (err error) {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
-		err = cmd.Run()
+		err = cmd.Start()
 		if err != nil {
 			log.Println("undeploy error: ", err)
 
 			lastErr = err
 
-			continue
+			select {
+			case <-ctx.Done():
+				log.Println("undeploy cancelled: ", ctx.Err())
+
+				return lastErr
+			default:
+				continue
+			}
+		}
+
+		err = waitOrStop(ctx, cmd)
+		if err != nil {
+			log.Println("undeploy error: ", err)
+
+			lastErr = err
+
+			select {
+			case <-ctx.Done():
+				log.Println("undeploy cancelled: ", ctx.Err())
+
+				return lastErr
+			default:
+				continue
+			}
 		}
 
 		destroyGitHubDeployments(ctx, ghCli, owner, repo, pullRequestID, ignoreMissing)
@@ -112,13 +135,22 @@ func contains(item string, list []string) bool {
 }
 
 // Get the list of deployed Pull request based on given script.
-func listDeployedPullRequests(listScript string) ([]string, error) {
-	var stdout strings.Builder
+func listDeployedPullRequests(ctx context.Context, listScript string) ([]string, error) {
+	var (
+		stdout strings.Builder
+		err    error
+	)
 
 	cmd := exec.Command(listScript)
 	cmd.Stdout = &stdout
 
-	if err := cmd.Run(); err != nil {
+	err = cmd.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	err = waitOrStop(ctx, cmd)
+	if err != nil {
 		return nil, err
 	}
 
